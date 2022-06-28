@@ -3,12 +3,12 @@ const express = require('express');
 const { PORT = 3000 } = process.env;
 const bodyParser = require('body-parser');
 
-const app = express();
 const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-
 mongoose.connect('mongodb://localhost:27017/mestodb');
+
+const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,8 +20,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', usersRouter);
-app.use('/', cardsRouter);
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
+
+app.use((error, req, res, next) => {
+  const statusCode = error.statusCode || 500;
+  res.status(statusCode).send({message: statusCode === 500 ? 'Произошла ошибка на сервере' : error.message});
+});
 
 // eslint-disable-next-line no-unused-vars
 app.use((req, res) => {

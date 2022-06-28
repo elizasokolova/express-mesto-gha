@@ -1,26 +1,32 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const InternalServerError = require('../errors/InternalServerError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => next(new InternalServerError('Произошла ошибка')));
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+        const message = Object.entries(error.errors)
+          .map(([errorName, errorMessage]) => `${errorName}: ${errorMessage}`)
+          .join('; ');
+        next(new BadRequestError(message));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(new InternalServerError());
       }
     });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
@@ -31,16 +37,16 @@ module.exports.getUserById = (req, res) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res.status(400).send({ message: 'Ошибка запроса' });
+        next(new BadRequestError('Ошибка запроса'));
       } else if (error.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(new InternalServerError());
       }
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -53,16 +59,19 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+        const message = Object.entries(error.errors)
+          .map(([errorName, errorMessage]) => `${errorName}: ${errorMessage}`)
+          .join('; ');
+        next(new BadRequestError(message));
       } else if (error.name === 'CastError') {
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(new InternalServerError());
       }
     });
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -75,11 +84,14 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+        const message = Object.entries(error.errors)
+          .map(([errorName, errorMessage]) => `${errorName}: ${errorMessage}`)
+          .join('; ');
+        next(new BadRequestError(message));
       } else if (error.name === 'CastError') {
-        res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(new InternalServerError());
       }
     });
 };
