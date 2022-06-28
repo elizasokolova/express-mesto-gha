@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 const app = express();
@@ -23,9 +24,10 @@ app.use((req, res, next) => {
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
+// eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
-  res.status(statusCode).send({message: statusCode === 500 ? 'Произошла ошибка на сервере' : error.message});
+  res.status(statusCode).send({ message: statusCode === 500 ? 'Произошла ошибка на сервере' : error.message });
 });
 
 // eslint-disable-next-line no-unused-vars
