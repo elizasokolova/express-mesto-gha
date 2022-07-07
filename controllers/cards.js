@@ -3,6 +3,7 @@ const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const InternalServerError = require('../errors/InternalServerError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -28,12 +29,17 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new mongoose.Error.DocumentNotFoundError();
+        next(new NotFoundError('Карточка с таким _id не существует'));
+      } else if (req.user._id !== card.owner.toString()) {
+        next(new ForbiddenError('Вы не можете удалить чужую карточку'));
       } else {
-        return res.status(200).send({ message: 'Карточка успешно удалена' });
+        Card.deleteOne(card)
+          .then(() => {
+            res.status(200).send({ message: 'Карточка успешно удалена' });
+          });
       }
     })
     .catch((error) => {
