@@ -1,9 +1,10 @@
 const express = require('express');
+
 const router = express.Router();
 const {
   getUsers, getUserInfo, getUserById, updateProfile, updateAvatar,
 } = require('../controllers/users');
-const {ValidationUpdateProfile, ValidationUpdateAvatar, ValidationUserId} = require('../middlewares/validation');
+const { ValidationUpdateProfile, ValidationUpdateAvatar, ValidationUserId } = require('../middlewares/validation');
 
 router.get('/', getUsers);
 router.get('/me', getUserInfo);

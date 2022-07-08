@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
-const { isURL } = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minlength: 2,  // минимальная длина имени — 2 символа
+    minlength: 2, // минимальная длина имени — 2 символа
     maxlength: 30, // а максимальная — 30 символов
   },
   link: {
