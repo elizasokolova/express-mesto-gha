@@ -50,10 +50,7 @@ module.exports.createUser = (req, res, next) => {
     .then(() => res.status(201).send({ name, about, avatar }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        const message = Object.entries(error.errors)
-          .map(([errorName, errorMessage]) => `${errorName}: ${errorMessage}`)
-          .join('; ');
-        next(new BadRequestError(message));
+        next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       } else if (error.code === 11000) {
         next(new ConflictError('Указанный e-mail уже зарегистрирован'));
       } else {
@@ -115,10 +112,10 @@ module.exports.updateProfile = (req, res, next) => {
     .then((user) => res.status(200).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        const message = Object.entries(error.errors)
-          .map(([errorName, errorMessage]) => `${errorName}: ${errorMessage}`)
-          .join('; ');
-        next(new BadRequestError(message));
+        // const message = Object.entries(error.errors)
+        //   .map(([errorName, errorMessage]) => `${errorName}: ${errorMessage}`)
+        //   .join('; ');
+        next(new BadRequestError('Переданы некорректные данные для обновления профиля'));
       } else if (error.name === 'CastError') {
         next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
@@ -140,10 +137,7 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((user) => res.status(200).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        const message = Object.entries(error.errors)
-          .map(([errorName, errorMessage]) => `${errorName}: ${errorMessage}`)
-          .join('; ');
-        next(new BadRequestError(message));
+        next(new BadRequestError('Переданы некорректные данные для обновления аватара'));
       } else if (error.name === 'CastError') {
         next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
