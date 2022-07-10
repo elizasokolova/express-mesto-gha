@@ -14,14 +14,18 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return next(new UnauthorizedError('Неправильные почта или пароль'));
+        next(new UnauthorizedError('Неправильные почта или пароль'));
+        return;
       }
+      // eslint-disable-next-line consistent-return
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           // если хэши не совпали, мы отклоняем промис
-          return next(new UnauthorizedError('Неправильные почта или пароль'));
+          next(new UnauthorizedError('Неправильные почта или пароль'));
+          return;
         }
-        return user; // аутентификация прошла успешно
+        // eslint-disable-next-line consistent-return
+        return user; // Я не понимаю почему EsLint ругается на них...
       });
     })
     .then((user) => {
