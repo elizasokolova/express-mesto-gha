@@ -65,7 +65,7 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         throw new mongoose.Error.DocumentNotFoundError();
       } else {
-        return res.send(user);
+        return res.status(200).send(user);
       }
     })
     .catch((error) => {
@@ -109,7 +109,7 @@ module.exports.updateProfile = (req, res, next) => {
       runValidators: true, // валидация данных перед изменением
     },
   )
-    .then((user) => res.send(user))
+    .then((user) => res.status(200).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         // const message = Object.entries(error.errors)
@@ -134,7 +134,7 @@ module.exports.updateAvatar = (req, res, next) => {
       runValidators: true, // валидация данных перед изменением
     },
   )
-    .then((user) => res.send(user))
+    .then((user) => res.status(200).send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные для обновления аватара'));

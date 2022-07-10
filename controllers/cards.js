@@ -61,7 +61,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         throw new mongoose.Error.DocumentNotFoundError();
       } else {
-        return res.send(card);
+        return res.status(200).send(card);
       }
     })
     .catch((error) => {
@@ -85,7 +85,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!card) {
         throw new mongoose.Error.DocumentNotFoundError();
       } else {
-        return res.send(card);
+        return res.status(200).send(card);
       }
     })
     .catch((error) => {
