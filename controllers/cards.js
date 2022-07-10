@@ -30,15 +30,15 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new NotFoundError('Карточка с таким _id не существует'));
-      } else if (req.user._id !== card.owner.toString()) {
-        next(new ForbiddenError('Вы не можете удалить чужую карточку'));
-      } else {
-        // Если добавить return, eslint ругается, что делать?
-        return Card.deleteOne(card)
-          .then(() => {
-            res.send({ message: 'Карточка успешно удалена' });
-          });
       }
+      if (req.user._id !== card.owner.toString()) {
+        next(new ForbiddenError('Вы не можете удалить чужую карточку'));
+      }
+      // Если добавить return, eslint ругается, что делать?
+      Card.deleteOne(card)
+        .then(() => {
+          res.status(200).send({ message: 'Карточка успешно удалена' });
+        });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
