@@ -8,9 +8,9 @@ const validationURL = (value) => {
 
 module.exports.ValidationSignUp = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().allow('').min(2).max(30),
-    about: Joi.string().allow('').min(2).max(30),
-    avatar: Joi.string().allow('').custom(validationURL),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom(validationURL),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   }),

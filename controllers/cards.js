@@ -33,9 +33,10 @@ module.exports.deleteCard = (req, res, next) => {
       } else if (req.user._id !== card.owner.toString()) {
         next(new ForbiddenError('Вы не можете удалить чужую карточку'));
       } else {
-        Card.deleteOne(card)
+        // Если добавить return, eslint ругается, что делать?
+        return Card.deleteOne(card)
           .then(() => {
-            res.status(200).send({ message: 'Карточка успешно удалена' });
+            res.send({ message: 'Карточка успешно удалена' });
           });
       }
     })
@@ -60,7 +61,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         throw new mongoose.Error.DocumentNotFoundError();
       } else {
-        return res.status(200).send(card);
+        return res.send(card);
       }
     })
     .catch((error) => {
@@ -84,7 +85,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!card) {
         throw new mongoose.Error.DocumentNotFoundError();
       } else {
-        return res.status(200).send(card);
+        return res.send(card);
       }
     })
     .catch((error) => {

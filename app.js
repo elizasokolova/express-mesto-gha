@@ -11,6 +11,7 @@ const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const { ValidationSignIn, ValidationSignUp } = require('./middlewares/validation');
+const NotFoundError = require('./errors/NotFoundError');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', { useNewUrlParser: true });
 const app = express();
@@ -28,17 +29,16 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
+app.use((req, res, next) => {
+  next(new NotFoundError('404 Not Found'));
+});
+
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
   res.status(statusCode).send({ message: statusCode === 500 ? 'Произошла ошибка на сервере' : error.message });
-});
-
-// eslint-disable-next-line no-unused-vars
-app.use((req, res) => {
-  res.status(404).send({ message: '404 Not Found' });
+  next();
 });
 
 app.listen(PORT, () => {

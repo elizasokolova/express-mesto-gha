@@ -14,12 +14,12 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(new UnauthorizedError('Неправильные почта или пароль'));
+        return next(new UnauthorizedError('Неправильные почта или пароль'));
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           // если хэши не совпали, мы отклоняем промис
-          next(new UnauthorizedError('Неправильные почта или пароль'));
+          return next(new UnauthorizedError('Неправильные почта или пароль'));
         }
         return user; // аутентификация прошла успешно
       });
@@ -65,7 +65,7 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         throw new mongoose.Error.DocumentNotFoundError();
       } else {
-        return res.status(200).send(user);
+        return res.send(user);
       }
     })
     .catch((error) => {
@@ -109,7 +109,7 @@ module.exports.updateProfile = (req, res, next) => {
       runValidators: true, // валидация данных перед изменением
     },
   )
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         // const message = Object.entries(error.errors)
@@ -134,7 +134,7 @@ module.exports.updateAvatar = (req, res, next) => {
       runValidators: true, // валидация данных перед изменением
     },
   )
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные для обновления аватара'));

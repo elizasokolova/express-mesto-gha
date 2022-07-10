@@ -4,7 +4,7 @@ const { JWT_SECRET } = require('../utils/secretKey');
 
 module.exports = (req, res, next) => {
   if (!req.cookies) {
-    next(new UnauthorizedError('Пройдите авторизацию'));
+    throw new UnauthorizedError('Пройдите авторизацию'); // Равносильно next(new Error)
   }
   const token = req.cookies.jwt;
   let payload;
