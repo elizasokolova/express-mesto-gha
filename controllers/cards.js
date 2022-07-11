@@ -29,13 +29,12 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка с таким _id не существует'));
+        return next(new NotFoundError('Карточка с таким _id не существует'));
       }
       if (req.user._id !== card.owner.toString()) {
-        next(new ForbiddenError('Вы не можете удалить чужую карточку'));
+        return next(new ForbiddenError('Вы не можете удалить чужую карточку'));
       }
-      // Если добавить return, eslint ругается, что делать?
-      Card.deleteOne(card)
+      return Card.deleteOne(card)
         .then(() => {
           res.status(200).send({ message: 'Карточка успешно удалена' });
         });
